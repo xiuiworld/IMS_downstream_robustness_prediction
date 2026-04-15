@@ -1,0 +1,97 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.eggs/
+*.manifest
+*.spec
+
+# PyInstaller
+*.manifest
+*.spec
+
+# mypy
+.mypy_cache/
+.dmypy.json
+
+# pytest
+.pytest_cache/
+
+# Pyre type checker
+.pyre/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+
+# Environment and credentials
+*.env
+*.env.*
+
+# Ignore local data caches and generated reports if created locally
+cache/
+*.cache
+
+# Ignore binary images/archives by default
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Ignore TrackEval build/install artifacts if generated
+TrackEval/build/
+TrackEval/dist/
+TrackEval/*.egg-info/
+
+# Keep existing tracked directories like TrackEval source under version control
+
+# Project datasets and ML artifacts
+data/
+data.zip
+
+# Model checkpoints / weights
+*.pt
+*.pth
+*.ckpt
+*.pt.tar
+*.bin
+*.safetensors
+*.onnx
+
+# Training / experiment outputs
+runs/
+wandb/
+mlruns/
+lightning_logs/
+tensorboard/

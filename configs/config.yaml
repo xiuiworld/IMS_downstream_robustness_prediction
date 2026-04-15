@@ -1,0 +1,42 @@
+# =============================================================================
+# Downstream Task Robustness Prediction Framework Configuration
+# =============================================================================
+
+# 1. Directory Paths
+paths:
+  raw_dir: "data/raw/MOT17"
+  interim_dir: "data/interim"
+  processed_dir: "data/processed"
+  manifest_dir: "data/interim/manifests"
+  clip_output_dir: "data/interim/clips"
+  annotation_dir: "data/interim/annotations"
+
+# 2. Dataset Split Definition
+dataset:
+  train:
+    - "MOT17-02-FRCNN"
+    - "MOT17-04-FRCNN"
+    - "MOT17-09-FRCNN"
+    - "MOT17-10-FRCNN"
+  val:
+    - "MOT17-11-FRCNN"
+  test:
+    - "MOT17-05-FRCNN"
+    - "MOT17-13-FRCNN"
+
+# 3. Clip Generation Parameters
+clip_generation:
+  clip_length: 30                  # Number of frames per clip
+  stride: 15                       # Sliding window stride
+  min_active_trajectories: 3       # Minimum required active GT trajectories per clip
+
+# 4. Obfuscation (Degradation) Parameters
+obfuscation:
+  blur_kernels: [3, 5, 7, 9, 11]
+  pixelate_blocks: [4, 8, 16, 32]
+  compression_crfs: [23, 28, 32, 38] # For Phase 3 OOD Generalization
+
+# 5. Naming Conventions (Format Strings)
+naming:
+  clip_id_format: "{sequence}_f{start_frame:06d}_f{end_frame:06d}"
+  degraded_clip_format: "{clip_id}_{deg_type}_{deg_param}"
