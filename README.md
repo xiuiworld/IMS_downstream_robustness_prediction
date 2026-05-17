@@ -190,6 +190,7 @@ RQ2 ablation용 single-task 모델은 아래 네 개입니다.
 
 ```bash
 python -m training.run_seed_sweep \
+  --experiments_root experiments/canonical_swin_v1 \
   --models param_mlp,visual_baseline,fusion_multitask \
   --include_ablations \
   --seeds 42,123,2026 \
@@ -255,10 +256,20 @@ python -m training.evaluate \
 여러 seed 결과는 아래처럼 집계합니다. 기본 group은 `run_id`, model/task, loss, target mode, epochs, batch size, backbone, feature dim, Swin normalization/pretrain/freeze 설정을 포함하므로 서로 다른 설정이 평균에 섞이지 않습니다. RQ1/RQ2 pairwise 비교와 OOD-only 비교는 `rq_summary.csv`에 저장됩니다. 최종 표 생성에는 smoke run이 섞이지 않은 clean `experiments_root`를 사용하세요.
 
 ```bash
-python -m training.aggregate_results --split test
+python -m training.aggregate_results \
+  --experiments_root experiments/canonical_swin_v1 \
+  --split test
 ```
 
-추론 효율성은 checkpoint 기준으로 측정하고, YOLOv8+DeepSORT 기준 latency는 별도 측정값을 `--reference_time_ms`로 넣습니다. 제안서/보고서에 직접 사용할 속도 비교는 `--input_source raw_frames --batch_size 1` 기준으로 측정합니다. 기본값인 cached benchmark는 shared video tensor 로딩, device transfer, model forward를 포함하지만 raw frame decode/resize는 제외하므로, speedup ratio를 계산하려면 `--allow_cached_speedup`을 명시해야 합니다.
+추론 효율성은 checkpoint 기준으로 측정하고, YOLOv8+DeepSORT 기준 latency는 `training.benchmark_downstream_reference`로 같은 GPU 환경에서 먼저 측정합니다. 제안서/보고서에 직접 사용할 surrogate 속도 비교는 `--input_source raw_frames --batch_size 1` 기준으로 측정합니다. 기본값인 cached benchmark는 shared video tensor 로딩, device transfer, model forward를 포함하지만 raw frame decode/resize는 제외하므로, speedup ratio를 계산하려면 `--allow_cached_speedup`을 명시해야 합니다.
+
+```bash
+python -m training.benchmark_downstream_reference \
+  --split test \
+  --num_clips 50 \
+  --device cuda \
+  --output_dir experiments/canonical_swin_v1/reference_yolo_deepsort
+```
 
 ```bash
 python -m training.benchmark_inference \
@@ -267,6 +278,25 @@ python -m training.benchmark_inference \
   --input_source raw_frames \
   --batch_size 1 \
   --reference_time_ms <YOLO_DEEPSORT_MS>
+```
+
+canonical sweep 전체에 대해 raw-frame surrogate benchmark를 일괄 실행하려면 reference benchmark 이후 아래 명령을 사용합니다.
+
+```bash
+python -m training.run_surrogate_benchmarks \
+  --experiments_root experiments/canonical_swin_v1 \
+  --reference_metrics experiments/canonical_swin_v1/reference_yolo_deepsort/reference_metrics.json \
+  --device cuda \
+  --amp
+```
+
+최종 산출물 누락 여부는 아래 명령으로 확인합니다.
+
+```bash
+python -m training.validate_canonical_results \
+  --experiments_root experiments/canonical_swin_v1 \
+  --require_reference \
+  --require_benchmarks
 ```
 
 `model_summary.json`에는 total/trainable parameter count가 저장됩니다. Fusion 계열은 visual trunk 외에 parameter branch와 fusion head가 추가되므로, 보고서에서는 total parameter와 visual trunk parameter를 구분해서 해석해야 합니다.
